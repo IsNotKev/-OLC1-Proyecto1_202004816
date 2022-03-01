@@ -24,7 +24,7 @@ public class Error_ {
         this.columna = columna;
         
     }
-
+    
     public int getFila() {
         return fila;
     }

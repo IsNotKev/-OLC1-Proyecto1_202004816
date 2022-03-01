@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Error_;
+package ExpresionRegular;
 
 import java.util.ArrayList;
 
@@ -11,12 +11,12 @@ import java.util.ArrayList;
  *
  * @author kevin
  */
-public class LinkedListError extends ArrayList<Error_>{
-    public LinkedListError() {
-		super();
+public class LinkedListExpresion extends ArrayList<Object>{
+
+    public LinkedListExpresion() {
+        super();
     }
-	
-    public void addError(Error_ error){
-	this.add(error);
+    public void addExpresion(Object objeto){
+	this.add(objeto);
     }
 }

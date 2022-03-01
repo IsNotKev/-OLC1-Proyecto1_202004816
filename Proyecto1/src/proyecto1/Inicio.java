@@ -5,6 +5,7 @@
  */
 package proyecto1;
 
+import analizadores.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -71,6 +72,11 @@ public class Inicio extends javax.swing.JFrame {
         });
 
         jButton3.setText("Analizar Entradas");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 0, 0));
@@ -201,6 +207,17 @@ public class Inicio extends javax.swing.JFrame {
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         escribirNuevo();
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        AnalizadorLenguaje ins = AnalizadorLenguaje.getInstance();
+		
+        String text = jTextArea1.getText();
+        
+	ins.analize(text);
+	for (int i = 0; i < ins.expresiones.size(); i++) {     
+            System.out.println(ins.expresiones.get(i).getClass().getName());
+	}
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments

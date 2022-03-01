@@ -11,9 +11,9 @@ package ExpresionRegular;
  */
 public class ExpresionRegular {
     String id;
-    String expresion;
+    Object expresion;
 
-    public ExpresionRegular(String id, String expresion) {
+    public ExpresionRegular(String id, Object expresion) {
         this.id = id;
         this.expresion = expresion;
     }
@@ -26,11 +26,11 @@ public class ExpresionRegular {
         this.id = id;
     }
 
-    public String getExpresion() {
+    public Object getExpresion() {
         return expresion;
     }
 
-    public void setExpresion(String expresion) {
+    public void setExpresion(Expresion expresion) {
         this.expresion = expresion;
     }
     

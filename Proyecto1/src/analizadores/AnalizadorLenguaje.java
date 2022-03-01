@@ -5,21 +5,26 @@
  */
 package analizadores;
 import Error_.*;
+import ExpresionRegular.*;
+import java.io.BufferedReader;
+import java.io.StringReader;
 /**
  *
  * @author kevin
  */
 public class AnalizadorLenguaje {
     public static AnalizadorLenguaje analizador;
-    public static LinkedListError list;
+    public static LinkedListError errores;
+    public static LinkedListExpresion expresiones;
             
     public void analize(String text){
 	try {
             System.out.println("Inicio de analisis");
-            list = new LinkedListError();
-            //Scanner scanner = new Scanner(new BufferedReader(new StringReader(text)));
-            //Parser parser = new Parser(scanner);
-            //parser.parse();
+            errores = new LinkedListError();
+            expresiones = new LinkedListExpresion();
+            Scanner scanner = new Scanner(new BufferedReader(new StringReader(text)));
+            Parser parser = new Parser(scanner);
+            parser.parse();
             System.out.println("Fin de analisis");
 	} catch (Exception e) {
 	}
@@ -27,17 +32,28 @@ public class AnalizadorLenguaje {
 	
     public static AnalizadorLenguaje getInstance(){
 	if(analizador == null){
-            list = new LinkedListError();
+            errores = new LinkedListError();
             analizador = new AnalizadorLenguaje();
+            expresiones = new LinkedListExpresion();
 	}
 	return analizador;
     }
-	
-    public static LinkedListError getList(){
-	return list;
+
+    public static LinkedListError getErrores(){
+	return errores;
     }
 	
-    public static void  setList(LinkedListError list){
-	analizador.list = list;
+    public static void  setErrores(LinkedListError list){
+	AnalizadorLenguaje.errores = list;
     }
+
+    public static LinkedListExpresion getExpresiones() {
+        return expresiones;
+    }
+
+    public static void setExpresiones(LinkedListExpresion expresiones) {
+        AnalizadorLenguaje.expresiones = expresiones;
+    }
+    
+    
 }
