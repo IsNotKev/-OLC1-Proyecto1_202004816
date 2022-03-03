@@ -5,6 +5,7 @@
  */
 package proyecto1;
 
+import ExpresionRegular.*;
 import analizadores.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -201,7 +202,27 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        AnalizadorLenguaje ins = AnalizadorLenguaje.getInstance();
+	ins.LimpiarInstancia();
+        Proyecto1.expresiones.clear();
+        Proyecto1.conjuntos.clear();
+        Proyecto1.entradas.clear();
+        String text = jTextArea1.getText();
+        
+	ins.analize(text);
+	for (int i = 0; i < ins.expresiones.size(); i++) {     
+            //System.out.println(ins.expresiones.get(i).getClass().getName());
+            
+            if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.ExpresionRegular")){
+                Proyecto1.expresiones.add((ExpresionRegular) ins.expresiones.get(i));
+            }else if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.Conjunto")){
+                Proyecto1.conjuntos.add((Conjunto) ins.expresiones.get(i));
+            }else if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.LexemaEntrada")){
+                Proyecto1.entradas.add((LexemaEntrada) ins.expresiones.get(i));
+            }                
+	}
+        
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -209,14 +230,30 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        
         AnalizadorLenguaje ins = AnalizadorLenguaje.getInstance();
-		
+	
+        Proyecto1.expresiones.clear();
+        Proyecto1.conjuntos.clear();
+        Proyecto1.entradas.clear();
         String text = jTextArea1.getText();
         
 	ins.analize(text);
 	for (int i = 0; i < ins.expresiones.size(); i++) {     
-            System.out.println(ins.expresiones.get(i).getClass().getName());
+            //System.out.println(ins.expresiones.get(i).getClass().getName());
+            
+            if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.ExpresionRegular")){
+                Proyecto1.expresiones.add((ExpresionRegular) ins.expresiones.get(i));
+            }else if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.Conjunto")){
+                Proyecto1.conjuntos.add((Conjunto) ins.expresiones.get(i));
+            }else if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.LexemaEntrada")){
+                Proyecto1.entradas.add((LexemaEntrada) ins.expresiones.get(i));
+            }                
 	}
+        
+        Proyecto1.obtenerConjuntos();
+        Proyecto1.verificarEntradas();
+        ins.LimpiarInstancia();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**

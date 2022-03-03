@@ -19,8 +19,17 @@ public class Conjunto {
     public Conjunto(String id, String exp) {
         this.id = id;
         this.exp = exp;
+        caracteres = new ArrayList();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }   
+    
     public String getExp() {
         return exp;
     }
@@ -37,6 +46,9 @@ public class Conjunto {
         this.caracteres = caracteres;
     }
     
+    public void addCaracter(char c){
+        caracteres.add(c);
+    }
     
     
 }

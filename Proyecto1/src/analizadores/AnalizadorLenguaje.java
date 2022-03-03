@@ -55,5 +55,13 @@ public class AnalizadorLenguaje {
         AnalizadorLenguaje.expresiones = expresiones;
     }
     
+    public static void LimpiarInstancia() {
+        if (analizador != null) {
+            errores.clear();
+            expresiones.clear();
+        } else {
+            System.out.println("No existe un analizador");
+        }
+    }
     
 }

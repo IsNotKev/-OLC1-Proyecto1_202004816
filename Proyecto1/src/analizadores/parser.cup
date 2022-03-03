@@ -64,8 +64,7 @@ INSTRUCCIONES ::=  INSTRUCCIONES:lista INSTRUCCION:val {:
 INSTRUCCION ::= CONJ DOSPUNTOS ID:id FLECHA TCONJUNTO:con PUNTOYCOMA {: RESULT= new Conjunto(id,con); :}
 | ID:id FLECHA EXPRESION:exp PUNTOYCOMA{: RESULT = new ExpresionRegular(id, exp); :}
 | ID:id FLECHA EXPRESION:exp PUNTOYCOMA SEPARADOR{: RESULT = new ExpresionRegular(id, exp); :}
-| ID:id DOSPUNTOS CADENA:cad PUNTOYCOMA {: RESULT = new LexemaEntrada(cad,id); :}
-| error PUNTOYCOMA;
+| ID:id DOSPUNTOS CADENA:cad PUNTOYCOMA {: RESULT = new LexemaEntrada(cad,id); :};
 
 TCONJUNTO ::= CONJUNTOMIN:c {: RESULT=new String(c); :}
 | CONJUNTOMAY:c {: RESULT=new String(c); :}
@@ -77,6 +76,6 @@ EXPRESION ::= PUNTO EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion(".",
 | MAS EXPRESION:exp1 {: RESULT = new Expresion("+",exp1); :}
 | POR EXPRESION:exp1 {: RESULT = new Expresion("*",exp1); :}
 | INTERROGACION EXPRESION:exp1 {: RESULT = new Expresion("?",exp1); :}
-| LLAVELEFT ID:id LLAVERIGHT {: RESULT = new Dato("id",id); :}
-| CADENA:c {: RESULT = new Dato("cadena",c); :};
+| LLAVELEFT ID:id LLAVERIGHT {: RESULT = new Dato("id",new String(id)); :}
+| CADENA:c {: RESULT = new Dato("cadena",new String(c)); :};
 
