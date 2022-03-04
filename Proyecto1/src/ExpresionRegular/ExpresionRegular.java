@@ -34,6 +34,4 @@ public class ExpresionRegular {
         this.expresion = expresion;
     }
     
-    
-    
 }

@@ -1,0 +1,21 @@
+digraph G{
+label="ExpresionReg2_Thomson";
+node [shape=circle];
+rankdir="LR";
+S0[label="S0"];
+S1[label="S1"];
+S2[label="S2"];
+S3[label="S3"];
+S4[label="S4"];
+S5[label="S5"];
+S6[label="S6"];
+S7[label = "S7"];S4->S5[taillabel="ε"];
+S5->S6[taillabel="digito"];
+S6->S7[taillabel="ε"];
+S7->S5[taillabel="ε"];
+S2->S3[taillabel="."];
+S3->S4[taillabel="ε"];
+S0->S1[taillabel="digito"];
+S1->S2[taillabel="ε"];
+
+}

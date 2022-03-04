@@ -1,0 +1,34 @@
+digraph G{
+label="erAzar_Thomson";
+node [shape=circle];
+rankdir="LR";
+S0[label="S0"];
+S1[label="S1"];
+S2[label="S2"];
+S3[label="S3"];
+S4[label = "S4"];S1->S2[taillabel="ε"];
+S2->S3[taillabel="simbols"];
+S3->S4[taillabel="ε"];
+S4->S2[taillabel="ε"];
+S5[label="S5"];
+S6[label="S6"];
+S7[label="S7"];
+S8[label="S8"];
+S9[label="S9"];
+S10[label="S10"];
+S11[label="S11"];
+S12[label="S12"];
+S7->S8[taillabel="ε"];
+S7->S9[taillabel="ε"];
+S8->S10[taillabel="minus"];
+S9->S11[taillabel="mayus"];
+S10->S12[taillabel="ε"];
+S11->S12[taillabel="ε"];
+S13[label = "S13"];S5->S6[taillabel="ε"];
+S6->S7[taillabel="ε"];
+S12->S13[taillabel="ε"];
+S13->S6[taillabel="ε"];
+S0->S1[taillabel="ε"];
+S4->S5[taillabel="ε"];
+
+}

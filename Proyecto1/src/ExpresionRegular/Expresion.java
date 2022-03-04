@@ -5,6 +5,10 @@
  */
 package ExpresionRegular;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
 /**
  *
  * @author kevin
@@ -48,8 +52,5 @@ public class Expresion {
 
     public void setSiguiente(Object siguiente) {
         this.siguiente = siguiente;
-    }
-    
-    
-    
+    }     
 }

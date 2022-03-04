@@ -203,7 +203,7 @@ public class Inicio extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         AnalizadorLenguaje ins = AnalizadorLenguaje.getInstance();
-	ins.LimpiarInstancia();
+	
         Proyecto1.expresiones.clear();
         Proyecto1.conjuntos.clear();
         Proyecto1.entradas.clear();
@@ -222,7 +222,8 @@ public class Inicio extends javax.swing.JFrame {
             }                
 	}
         
-        
+        Proyecto1.graficar();
+        ins.LimpiarInstancia();        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
