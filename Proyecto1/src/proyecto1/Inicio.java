@@ -84,6 +84,7 @@ public class Inicio extends javax.swing.JFrame {
         jLabel1.setText("Entrada:");
 
         jTextArea2.setColumns(20);
+        jTextArea2.setFont(new java.awt.Font("Century Gothic", 0, 15)); // NOI18N
         jTextArea2.setRows(5);
         jScrollPane2.setViewportView(jTextArea2);
 
@@ -223,7 +224,9 @@ public class Inicio extends javax.swing.JFrame {
 	}
         
         Proyecto1.graficar();
-        ins.LimpiarInstancia();        
+        ins.LimpiarInstancia();  
+        jTextArea2.append(Proyecto1.salida);
+        Proyecto1.salida = "";
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
@@ -255,6 +258,10 @@ public class Inicio extends javax.swing.JFrame {
         Proyecto1.obtenerConjuntos();
         Proyecto1.verificarEntradas();
         ins.LimpiarInstancia();
+        
+        jTextArea2.append(Proyecto1.salida);
+        Proyecto1.salida = "";
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**

@@ -23,6 +23,7 @@ public class Proyecto1 {
     public static ArrayList<ExpresionRegular> expresiones = new ArrayList<ExpresionRegular>();
     public static ArrayList<LexemaEntrada> entradas = new ArrayList<LexemaEntrada>();
     public static int contador = 0;
+    public static String salida;
     
     public static void main(String[] args) {
         Inicio in = new Inicio();
@@ -34,16 +35,24 @@ public class Proyecto1 {
         //System.out.println("-----------"+conjuntos.size()+"------------");
         for(int i = 0; i< conjuntos.size();i++){
             //System.out.println("------ " + conjuntos.get(i).getExp() );
-            String s = (conjuntos.get(i).getExp().split("~"))[0];
-            String s2 = (conjuntos.get(i).getExp().split("~"))[1];
-            byte[] bytes = s.getBytes(StandardCharsets.US_ASCII);
-            byte[] bytes2 = s2.getBytes(StandardCharsets.US_ASCII);
-            //System.out.println(bytes[0] + "~" + bytes2[0] + "******Suma ="+(bytes[0]+bytes2[0]));
-            
-            for(int j = bytes[0]; j<=bytes2[0];j++){
-                System.out.println((char)j);
-                conjuntos.get(i).addCaracter((char)j);
-            }
+            if(conjuntos.get(i).getExp().contains("~")){
+                String s = (conjuntos.get(i).getExp().split("~"))[0];
+                String s2 = (conjuntos.get(i).getExp().split("~"))[1];
+                byte[] bytes = s.getBytes(StandardCharsets.US_ASCII);
+                byte[] bytes2 = s2.getBytes(StandardCharsets.US_ASCII);
+                //System.out.println(bytes[0] + "~" + bytes2[0] + "******Suma ="+(bytes[0]+bytes2[0]));
+
+                for(int j = bytes[0]; j<=bytes2[0];j++){
+                    //System.out.println((char)j);
+                    conjuntos.get(i).addCaracter((char)j);
+                }
+            }else{
+                String[] caracteres = conjuntos.get(i).getExp().split(",");
+                for(int j = 0;j<caracteres.length;j++){
+                   // System.out.println(caracteres[j]);
+                    conjuntos.get(i).addCaracter(caracteres[j].charAt(0));
+                }
+            }            
         }
         //System.out.println("Conjunto Creado");
     }
@@ -56,8 +65,10 @@ public class Proyecto1 {
                     String[] lex = entradas.get(i).getLexema().split("\"");
                     if(verificar(expresiones.get(j).getExpresion(),lex[1])){
                         System.out.println("Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp());
+                        salida += ">>>  Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
                     }else{
                         System.out.println("Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp());
+                        salida += ">>>  Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
                     }
                 }
             }
@@ -77,7 +88,6 @@ public class Proyecto1 {
                     char cadena = (data.getLex().split("\"")[1]).charAt(0);
                     //System.out.println(cadena);
                     //System.out.println(Character.compare(c, cadena) == 0);
-                   
                     return (Character.compare(c, cadena) == 0);
                 }else{
                     for(int i = 0; i<conjuntos.size();i++){
@@ -88,7 +98,6 @@ public class Proyecto1 {
                                 if(Character.compare(c, cadena) == 0){
                                     //System.out.println("Si es " + conjuntos.get(i).getId());
                                     //System.out.println(c + "=" + cadena);
-                                    
                                     return true;
                                 }
                             }
@@ -170,8 +179,9 @@ public class Proyecto1 {
                         } 
                        
                     }
-                    return(true);
+                    return true;
                 default:
+                    System.out.println("No es nada");
                     return false;
             }
         }
@@ -180,12 +190,21 @@ public class Proyecto1 {
     public static void graficar(){
         for(int i = 0; i<expresiones.size();i++){
             Object g = expresiones.get(i).getExpresion();
-            String resultado = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_Thomson\";\nnode [shape=circle];\nrankdir=\"LR\";\n";
+            String resultado = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_Thomson\";\nnode [shape=circle];\nrankdir=\"LR\";inicio[shape=point]\ninicio->S0[taillabel=\"INICIO\"];\n";
             ArrayList<String> aux = graficarEstructuraThomson(g);
-            escribirDot(expresiones.get(i).getId()+"_Thomson",resultado + aux.get(2) + "\n}");
+            escribirDot(expresiones.get(i).getId()+"_Thomson",resultado + aux.get(2) + "S"+(contador-1)+"[shape=doublecircle];\n}");
             graficarImagen(expresiones.get(i).getId()+"_Thomson");
             contador = 0;
+            
+            Expresion nueva = new Expresion(".",g,new Dato("cadena","\"#\""));
+            String resultado2 = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_Arbol\";\nnode [shape=circle];\nrankdir=\"TB\";\n";
+            ArrayList<String> aux2 = graficarMetodoDelArbol(nueva);
+            escribirDot(expresiones.get(i).getId()+"_Arbol",resultado2 + aux2.get(1)+"\n}");
+            graficarImagen(expresiones.get(i).getId()+"_Arbol");
+            contador = 0;
         }
+        
+        salida = ">>>   Grafos creados exitosamente.\n";
     }
     
     public static ArrayList<String> graficarEstructuraThomson(Object expresionActual){
@@ -424,5 +443,91 @@ public class Proyecto1 {
        } catch (Exception e) {
            e.printStackTrace();
        }
+    }
+    
+    
+    public static ArrayList<String> graficarMetodoDelArbol(Object expresionActual){
+        ArrayList<String> respuesta = new ArrayList<String>();
+        
+        if(expresionActual.getClass().getName().equals("ExpresionRegular.Dato")){
+            Dato data = (Dato)expresionActual;
+            if(data.getTipo().equals("id")){
+                respuesta.add("S"+contador);
+                respuesta.add("S"+contador+"[label=\""+data.getLex()+"\"];\n");
+                contador += 1;          
+            }else{
+                respuesta.add("S"+contador);
+                respuesta.add("S"+contador+"[label=\""+data.getLex().split("\"")[1]+"\"];\n");
+                contador += 1;
+            }           
+        }else{
+            Expresion exp = (Expresion)expresionActual;
+            String conexiones = "";
+            String nodos = "";
+            String aux;
+            ArrayList<String> first;
+            ArrayList<String> next;
+            
+            switch(exp.getOperador()){
+                case ".":
+                    aux = "S"+contador;
+                    contador += 1;
+                    nodos += aux + "[label = \".\"];\n";
+                    first = graficarMetodoDelArbol(exp.getPrimero());
+                    next = graficarMetodoDelArbol(exp.getSiguiente());
+                    conexiones += aux + "->" + first.get(0) + ";\n";
+                    conexiones += aux + "->" + next.get(0)+ ";\n";
+                    
+                    respuesta.add(aux);
+                    respuesta.add(nodos + first.get(1) + next.get(1) + conexiones);
+                    
+                    break;
+                case "|":
+                    aux = "S"+contador;
+                    contador += 1;
+                    nodos += aux + "[label = \"|\"];\n";
+                    first = graficarMetodoDelArbol(exp.getPrimero());
+                    next = graficarMetodoDelArbol(exp.getSiguiente());
+                    conexiones += aux + "->" + first.get(0)+ ";\n";
+                    conexiones += aux + "->" + next.get(0)+ ";\n";
+                    
+                    respuesta.add(aux);
+                    respuesta.add(nodos + first.get(1) + next.get(1) + conexiones);
+                    break;
+                case "*":
+                    aux = "S"+contador;
+                    contador += 1;
+                    nodos += aux + "[label = \"*\"];\n";
+                    first = graficarMetodoDelArbol(exp.getPrimero());
+                    conexiones += aux + "->" + first.get(0)+ ";\n";
+                    
+                    respuesta.add(aux);
+                    respuesta.add(nodos + first.get(1)+ conexiones);
+                    break;
+                case "+":
+                    aux = "S"+contador;
+                    contador += 1;
+                    nodos += aux + "[label = \"+\"];\n";
+                    first = graficarMetodoDelArbol(exp.getPrimero());
+                    conexiones += aux + "->" + first.get(0)+ ";\n";
+                    
+                    respuesta.add(aux);
+                    respuesta.add(nodos + first.get(1)+ conexiones);
+                    break;
+                case "?":
+                    aux = "S"+contador;
+                    contador += 1;
+                    nodos += aux + "[label = \"?\"];\n";
+                    first = graficarMetodoDelArbol(exp.getPrimero());
+                    conexiones += aux + "->" + first.get(0)+ ";\n";
+                    
+                    respuesta.add(aux);
+                    respuesta.add(nodos + first.get(1)+ conexiones);
+                    break;
+            }
+        }
+        
+        
+        return respuesta;       
     }
 }

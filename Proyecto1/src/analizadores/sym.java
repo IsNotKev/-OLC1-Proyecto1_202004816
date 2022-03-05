@@ -19,6 +19,8 @@ public class sym {
   public static final int FLECHA = 6;
   public static final int ID = 14;
   public static final int POR = 9;
+  public static final int CARACTER = 21;
+  public static final int COMA = 20;
   public static final int SEPARADOR = 13;
   public static final int EOF = 0;
   public static final int CONJ = 4;
@@ -48,7 +50,9 @@ public class sym {
   "CONJUNTOMAY",
   "CONJUNTOMIN",
   "CONJUNTODIGITO",
-  "CONJUNTOSIGNO"
+  "CONJUNTOSIGNO",
+  "COMA",
+  "CARACTER"
   };
 }
 

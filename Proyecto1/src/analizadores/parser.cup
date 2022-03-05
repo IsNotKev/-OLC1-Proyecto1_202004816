@@ -30,13 +30,14 @@ terminal String CONJ, DOSPUNTOS, FLECHA;
 terminal String PUNTO,OR,POR,MAS,INTERROGACION;
 terminal String PUNTOYCOMA, SEPARADOR;
 terminal String ID, CADENA;
-terminal String CONJUNTOMAY, CONJUNTOMIN, CONJUNTODIGITO, CONJUNTOSIGNO;
+terminal String CONJUNTOMAY, CONJUNTOMIN, CONJUNTODIGITO, CONJUNTOSIGNO, COMA, CARACTER;
 
 non terminal INICIO;
 non terminal ArrayList<Object> INSTRUCCIONES;
 non terminal Object INSTRUCCION;
 non terminal String TCONJUNTO;
 non terminal EXPRESION;
+non terminal String LISTA;
 
 precedence left PUNTO,OR;
 precedence left POR,MAS,INTERROGACION;
@@ -69,7 +70,11 @@ INSTRUCCION ::= CONJ DOSPUNTOS ID:id FLECHA TCONJUNTO:con PUNTOYCOMA {: RESULT= 
 TCONJUNTO ::= CONJUNTOMIN:c {: RESULT=new String(c); :}
 | CONJUNTOMAY:c {: RESULT=new String(c); :}
 | CONJUNTODIGITO:c {: RESULT=new String(c); :}
-| CONJUNTOSIGNO:c {: RESULT=new String(c); :};
+| CONJUNTOSIGNO:c {: RESULT=new String(c); :}
+| LISTA:l {: RESULT = new String(l);:};
+
+LISTA ::= LISTA:l COMA CARACTER:c {: RESULT= (l+","+new String(c)); :}
+| CARACTER:c {: RESULT = new String(c); :};
 
 EXPRESION ::= PUNTO EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion(".",exp1,exp2); :}
 | OR EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion("|",exp1,exp2); :}

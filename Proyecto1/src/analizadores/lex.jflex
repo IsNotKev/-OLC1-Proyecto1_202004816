@@ -22,27 +22,30 @@ COMENTARIOL =[\/\/][^\n]*[\n]
 COMENTARIOML =[<][!][^!]*[!][>]
 ID =[a-zA-z\_][a-zA-Z\d\_]*
 CADENA =[\"][^\"]*[\"]
-CONJUNTOSIGNO =[\!\"\#\$\%\&\'\(\)\*\+\,\-\/\:\;\<\>\=\?\@\\\[\]\^\_\`\{\|\}][\~][\!\"\#\$\%\&\'\(\)\*\+\,\-\/\:\;\<\>\=\?\@\\\[\]\^\_\`\{\|\}]
+CONJUNTOSIGNO =[\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}][\~][\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}]
 CONJUNTODIGITO =[\d][\~][\d]
 CONJUNTOMIN =[a-z][\~][a-z]
 CONJUNTOMAY =[A-Z][\~][A-Z]
-
+FLECHA=[\-][ ]?[\>]
+CARACTER = [a-zA-z\d]
 
 %%
 
 "{" {return new Symbol(sym.LLAVELEFT, yycolumn, yyline, yytext());}
 "}" {return new Symbol(sym.LLAVERIGHT, yycolumn, yyline, yytext());}
 "CONJ" {return new Symbol(sym.CONJ,yycolumn,yyline,yytext());}
-":" {return new Symbol(sym.DOSPUNTOS,yycolumn,yyline,yytext());}
-"->" {return new Symbol(sym.FLECHA,yycolumn,yyline,yytext());}
+":" {return new Symbol(sym.DOSPUNTOS,yycolumn,yyline,yytext());} 
 "." {return new Symbol(sym.PUNTO, yycolumn, yyline, yytext());}
+"," {return new Symbol(sym.COMA, yycolumn, yyline, yytext());}
 "|" {return new Symbol(sym.OR, yycolumn, yyline, yytext());}
 "*" {return new Symbol(sym.POR, yycolumn, yyline, yytext());}
 "+" {return new Symbol(sym.MAS, yycolumn, yyline, yytext());}
 "?" {return new Symbol(sym.INTERROGACION, yycolumn, yyline, yytext());}
 ";" {return new Symbol(sym.PUNTOYCOMA, yycolumn, yyline, yytext());}
 "%%" {return new Symbol(sym.SEPARADOR, yycolumn, yyline, yytext());}
+{FLECHA} {return new Symbol(sym.FLECHA,yycolumn,yyline,yytext());}
 
+{CARACTER} {return new Symbol(sym.CARACTER, yycolumn, yyline, yytext());}
 {WHITE} {}
 {COMENTARIOL} {}
 {COMENTARIOML} {}
