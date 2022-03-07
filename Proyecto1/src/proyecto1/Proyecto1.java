@@ -67,6 +67,7 @@ public class Proyecto1 {
     }
     
     public static void verificarEntradas(){
+        String salidajson = "[";
         for(int i = 0 ; i<entradas.size();i++){
             for(int j = 0; j<expresiones.size();j++){
                 if(entradas.get(i).getExp().equals(expresiones.get(j).getId())){
@@ -75,13 +76,23 @@ public class Proyecto1 {
                     if(verificar(expresiones.get(j).getExpresion(),lex[1])){
                         System.out.println("Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp());
                         salida += ">>>  Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
+                        salidajson += "\n   {\n     \"Valor\":"+entradas.get(i).getLexema()+",\n"
+                                + "     \"ExpresionRegular\":\""+entradas.get(i).getExp()+"\",\n"
+                                + "     \"Resultado\":\"Cadena Válida\"\n   },";
                     }else{
                         System.out.println("Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp());
                         salida += ">>>  Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
+                        salidajson += "\n   {\n     \"Valor\":"+entradas.get(i).getLexema()+",\n"
+                                + "     \"ExpresionRegular\":\""+entradas.get(i).getExp()+"\",\n"
+                                + "     \"Resultado\":\"Cadena No Válida\"\n   },";
                     }
                 }
             }
         }
+        
+        salidajson = salidajson.substring(0,salidajson.length()-1);
+        salidajson += "\n]";
+        escribirDot("Salida", salidajson, "json");
     }
 
     public static boolean verificar(Object exp, String lexema){ 
@@ -455,6 +466,12 @@ public class Proyecto1 {
                 case "t":
                     ruta = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".txt";
                     break;
+                case "afd":
+                    ruta = System.getProperty("user.dir") + "\\AFD_202004816\\"+title+".txt";
+                    break;
+                case "json":
+                    ruta = System.getProperty("user.dir")+"\\"+title+".json";
+                    break;
                 default:
                     ruta = System.getProperty("user.dir") + "\\"+title+".txt";
                     break;
@@ -496,6 +513,10 @@ public class Proyecto1 {
                 case "t":
                     fileInputPath = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".txt";
                     fileOutputPath = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".jpg";
+                    break;
+                case "afd":
+                    fileInputPath = System.getProperty("user.dir") + "\\AFD_202004816\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\AFD_202004816\\"+title+".jpg";
                     break;
                 default:
                     fileInputPath = System.getProperty("user.dir") + "\\"+title+".txt";
@@ -954,5 +975,16 @@ public class Proyecto1 {
         return respuesta;
     }
     
-    
+    public ArrayList<Estado> obtenerTablaTransiciones(ArrayList<Hoja> hojas){       
+        ArrayList<Estado> estados = new ArrayList<Estado>();
+        
+        ArrayList<Integer> n = new ArrayList<Integer>();
+        n.add(hojas.get(0).getNo());
+        Estado inicio = new Estado("S"+contador,n);
+        contador += 1; 
+        
+        
+        
+        return estados;
+    }
 }
