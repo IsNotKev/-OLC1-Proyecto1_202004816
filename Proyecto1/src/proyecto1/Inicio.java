@@ -212,8 +212,7 @@ public class Inicio extends javax.swing.JFrame {
         
 	ins.analize(text);
 	for (int i = 0; i < ins.expresiones.size(); i++) {     
-            //System.out.println(ins.expresiones.get(i).getClass().getName());
-            
+            //System.out.println(ins.expresiones.get(i).getClass().getName());            
             if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.ExpresionRegular")){
                 Proyecto1.expresiones.add((ExpresionRegular) ins.expresiones.get(i));
             }else if(ins.expresiones.get(i).getClass().getName().equals("ExpresionRegular.Conjunto")){
@@ -223,9 +222,18 @@ public class Inicio extends javax.swing.JFrame {
             }                
 	}
         
-        Proyecto1.graficar();
-        ins.LimpiarInstancia();  
-        jTextArea2.append(Proyecto1.salida);
+        jTextArea2.setText(null);
+        if(ins.errores.size() > 0){          
+            for(int j = 0 ; j<ins.errores.size () ; j++){
+                jTextArea2.append(">>> "+ins.errores.get(j).getMessage() + ", linea: "+ins.errores.get(j).getFila()+", columna: "+ins.errores.get(j).getColumna()+".\n");
+            }           
+        }else{
+            
+            Proyecto1.graficar();            
+            jTextArea2.append(Proyecto1.salida);           
+        } 
+        
+        ins.LimpiarInstancia();
         Proyecto1.salida = "";
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -255,10 +263,17 @@ public class Inicio extends javax.swing.JFrame {
             }                
 	}
         
-        Proyecto1.obtenerConjuntos();
-        Proyecto1.verificarEntradas();
-        ins.LimpiarInstancia();
         
+        if(ins.errores.size()>0){
+            for(int j = 0 ; j<ins.errores.size () ; j++){
+                jTextArea2.setText(null);
+                jTextArea2.append(">>> "+ins.errores.get(j).getMessage() + ", linea: "+ins.errores.get(j).getFila()+", columna: "+ins.errores.get(j).getColumna()+".\n");
+            } 
+        }else{
+            Proyecto1.obtenerConjuntos();
+            Proyecto1.verificarEntradas();
+            ins.LimpiarInstancia();
+        }      
         jTextArea2.append(Proyecto1.salida);
         Proyecto1.salida = "";
 

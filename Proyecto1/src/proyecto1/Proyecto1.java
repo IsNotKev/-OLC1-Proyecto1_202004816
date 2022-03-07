@@ -6,6 +6,7 @@
 package proyecto1; 
 
 import ExpresionRegular.*;
+import Error_.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,6 +23,7 @@ public class Proyecto1 {
     public static ArrayList<Conjunto> conjuntos = new ArrayList<Conjunto>();
     public static ArrayList<ExpresionRegular> expresiones = new ArrayList<ExpresionRegular>();
     public static ArrayList<LexemaEntrada> entradas = new ArrayList<LexemaEntrada>();
+    public static ArrayList<Error_> errores = new ArrayList<Error_>();
     public static int contador = 0;
     public static String salida;
     
@@ -43,8 +45,15 @@ public class Proyecto1 {
                 //System.out.println(bytes[0] + "~" + bytes2[0] + "******Suma ="+(bytes[0]+bytes2[0]));
 
                 for(int j = bytes[0]; j<=bytes2[0];j++){
-                    //System.out.println((char)j);
-                    conjuntos.get(i).addCaracter((char)j);
+                    if(bytes[0] < 65 || (bytes[0]>90 && bytes[0]<97) || bytes[0]>122){
+                        if(j < 65 || (j>90 && j<97) || j>122){
+                            //System.out.println((char)j);
+                            conjuntos.get(i).addCaracter((char)j);
+                        }
+                    }else{
+                        //System.out.println((char)j);
+                        conjuntos.get(i).addCaracter((char)j);
+                    }
                 }
             }else{
                 String[] caracteres = conjuntos.get(i).getExp().split(",");
@@ -189,19 +198,47 @@ public class Proyecto1 {
     
     public static void graficar(){
         for(int i = 0; i<expresiones.size();i++){
+            //METODO DE THOMPSON
             Object g = expresiones.get(i).getExpresion();
             String resultado = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_Thomson\";\nnode [shape=circle];\nrankdir=\"LR\";inicio[shape=point]\ninicio->S0[taillabel=\"INICIO\"];\n";
             ArrayList<String> aux = graficarEstructuraThomson(g);
-            escribirDot(expresiones.get(i).getId()+"_Thomson",resultado + aux.get(2) + "S"+(contador-1)+"[shape=doublecircle];\n}");
-            graficarImagen(expresiones.get(i).getId()+"_Thomson");
+            escribirDot(expresiones.get(i).getId()+"_Thomson",resultado + aux.get(2) + "S"+(contador-1)+"[shape=doublecircle];\n}","afnd");
+            graficarImagen(expresiones.get(i).getId()+"_Thomson","afnd");
             contador = 0;
             
+            //ARBOL
             Expresion nueva = new Expresion(".",g,new Dato("cadena","\"#\""));
             String resultado2 = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_Arbol\";\nnode [shape=circle];\nrankdir=\"TB\";\n";
             ArrayList<String> aux2 = graficarMetodoDelArbol(nueva);
-            escribirDot(expresiones.get(i).getId()+"_Arbol",resultado2 + aux2.get(1)+"\n}");
-            graficarImagen(expresiones.get(i).getId()+"_Arbol");
+            escribirDot(expresiones.get(i).getId()+"_Arbol",resultado2 + aux2.get(1)+"\n}","arbol");
+            graficarImagen(expresiones.get(i).getId()+"_Arbol","arbol");
             contador = 0;
+            
+            //TABLA DE SIGUIENTES
+            ArrayList<Object> aux3 = obtenerTablaDeSiguientes(nueva);
+            ArrayList<Hoja> hojas = (ArrayList<Hoja>)aux3.get(2);           
+            String resultado3="digraph G{\nlabel=\""+expresiones.get(i).getId()+"_TSiguiente\";\n",f1= "{No",f2= "{Hoja",f3 = "{Siguientes";                       
+            //System.out.println("---------------"+expresiones.get(i).getId()+"------------------");
+            for(int j = 0;j<hojas.size();j++){
+                //hojas.get(j).imprimir();
+                f1 += "|" + hojas.get(j).getNo();
+                f2 += "|" + hojas.get(j).getTransicion();
+                
+                if(hojas.get(j).getSiguiente() != null){
+                    f3 += "|" + hojas.get(j).getSiguiente();
+                }else{
+                    f3 += "| FINAL";
+                }                             
+            }           
+            f1 += "}"; f2 += "}"; f3 += "}";
+            resultado3 += "node [fontname=\"Arial\"];\n node_A [shape=record label=\""+f1+"|"+f2+"|"+f3+"\"];\n}";
+            escribirDot(expresiones.get(i).getId()+"_TSiguiente",resultado3,"s");
+            graficarImagen(expresiones.get(i).getId()+"_TSiguiente","s");
+            contador = 0;
+            
+            //Tabla de Transiciones
+            
+            
         }
         
         salida = ">>>   Grafos creados exitosamente.\n";
@@ -402,9 +439,28 @@ public class Proyecto1 {
         return respuesta;
     }
     
-    public static void escribirDot(String title, String resultado){
+    public static void escribirDot(String title, String resultado, String type){
         try {
-            String ruta = System.getProperty("user.dir") + "\\"+title+".txt";
+            String ruta;
+            switch(type){
+                case "afnd":
+                    ruta = System.getProperty("user.dir") + "\\AFND_202004816\\"+title+".txt";
+                    break;
+                case "arbol":
+                    ruta = System.getProperty("user.dir") + "\\ARBOLES_202004816\\"+title+".txt";
+                    break;
+                case "s":
+                    ruta = System.getProperty("user.dir") + "\\SIGUIENTES_202004816\\"+title+".txt";
+                    break;
+                case "t":
+                    ruta = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".txt";
+                    break;
+                default:
+                    ruta = System.getProperty("user.dir") + "\\"+title+".txt";
+                    break;
+            }
+            
+            
             File file = new File(ruta);
             
             FileWriter fw = new FileWriter(file);
@@ -417,13 +473,36 @@ public class Proyecto1 {
         }
     }
     
-    public static void graficarImagen(String title){ 
+    public static void graficarImagen(String title, String type){ 
        try {
            
            String dotPath = "C:\\Program Files\\Graphviz\\bin\\dot.exe";
-           String fileInputPath = System.getProperty("user.dir") + "\\"+title+".txt";
-           String fileOutputPath = System.getProperty("user.dir") + "\\"+title+".jpg";;
-
+           String fileInputPath;
+           String fileOutputPath;        
+           
+           switch(type){
+                case "afnd":
+                    fileInputPath = System.getProperty("user.dir") + "\\AFND_202004816\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\AFND_202004816\\"+title+".jpg"; 
+                    break;
+                case "arbol":
+                    fileInputPath = System.getProperty("user.dir") + "\\ARBOLES_202004816\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\ARBOLES_202004816\\"+title+".jpg";
+                    break;
+                case "s":
+                    fileInputPath = System.getProperty("user.dir") + "\\SIGUIENTES_202004816\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\SIGUIENTES_202004816\\"+title+".jpg";
+                    break;
+                case "t":
+                    fileInputPath = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\TRANSICIONES_202004816\\"+title+".jpg";
+                    break;
+                default:
+                    fileInputPath = System.getProperty("user.dir") + "\\"+title+".txt";
+                    fileOutputPath = System.getProperty("user.dir") + "\\"+title+".jpg"; 
+                    break;
+            }
+           
            String tParam = "-Tjpg";
            String tOParam = "-o";
            
@@ -530,4 +609,350 @@ public class Proyecto1 {
         
         return respuesta;       
     }
+    
+    
+    public static ArrayList<Object> obtenerTablaDeSiguientes(Object exp){
+        ArrayList<Object> respuesta = new ArrayList<Object>();
+        
+        if(exp.getClass().getName().equals("ExpresionRegular.Dato")){       
+            Dato data = (Dato)exp;
+            Hoja n;
+            
+            ArrayList<Integer> primeros = new ArrayList<Integer>();
+            ArrayList<Integer> ultimos = new ArrayList<Integer>();
+            ArrayList<Hoja> resto = new ArrayList<Hoja>();
+            
+            if(data.getTipo().equals("id")){
+                n = new Hoja(contador,data.getLex());         
+            }else{
+                n = new Hoja(contador,data.getLex().split("\"")[1]);
+            }                         
+            
+            primeros.add(contador);
+            ultimos.add(contador);
+            resto.add(n);
+            contador += 1;
+            
+            respuesta.add(primeros);
+            respuesta.add(ultimos);
+            respuesta.add(resto);
+        }else{
+            Expresion expresionActual = (Expresion)exp;       
+            
+            ArrayList<Object> primero;
+            ArrayList<Object> siguiente;
+                     
+            ArrayList<Hoja> t1 = new ArrayList<Hoja>();
+            ArrayList<Hoja> t2 = new ArrayList<Hoja>();
+            ArrayList<Hoja> terminados = new ArrayList<Hoja>();
+            
+            switch(expresionActual.getOperador()){
+                case ".":
+                    
+                    primero = obtenerTablaDeSiguientes(expresionActual.getPrimero());
+                    
+                    siguiente = obtenerTablaDeSiguientes(expresionActual.getSiguiente());
+                    
+                    ArrayList<Integer> p1 = (ArrayList<Integer>)primero.get(0);
+                    ArrayList<Integer> p2 = (ArrayList<Integer>)siguiente.get(0);
+                    ArrayList<Integer> sig1 = (ArrayList<Integer>)primero.get(1);
+                    ArrayList<Integer> sig2 = (ArrayList<Integer>)siguiente.get(1);
+                    
+                    
+                    t1 = (ArrayList<Hoja>)primero.get(2);
+                    t2 = (ArrayList<Hoja>)siguiente.get(2);
+                    
+                    for(int i = 0; i< sig1.size(); i++){
+                        for(int j = 0 ; j< p2.size() ; j++){
+                            for(int k = 0;k<t1.size();k++){
+                                Hoja n = t1.get(k);
+                                if(n.getNo()== sig1.get(i)){
+                                    if(n.siguiente != null){
+                                        n.setSiguiente(n.getSiguiente()+"," + p2.get(j));
+                                    }else{
+                                        n.setSiguiente(String.valueOf(p2.get(j)));
+                                    }
+                                    
+                                }
+                            }                           
+                        }
+                    }
+                    
+                    terminados.addAll(t1);
+                    terminados.addAll(t2);
+                                       
+                    
+                    
+                    String x;
+                    String x2;
+                    String r = "";
+                    if(primero.size() > 3 && siguiente.size() >3){
+                        x = (String) primero.get(3);
+                        x2 = (String) siguiente.get(3);
+                        
+                        if((x.equals("x") && x2.equals("x")) || x.equals("xdi") && x2.equals("xdi")){
+                            r=("xdi");
+                        }else if(x.equals("xd") && x2.equals("xd")){
+                            
+                            for(int i = 0; i< p1.size(); i++){
+                                for(int j = 0 ; j< p2.size() ; j++){
+                                    for(int k = 0;k<t1.size();k++){
+                                        Hoja n = t1.get(k);
+                                        if(n.getNo()== p1.get(i)){
+                                            if(n.siguiente != null){
+                                                n.setSiguiente(n.getSiguiente()+"," + p2.get(j));
+                                            }else{
+                                                n.setSiguiente(String.valueOf(p2.get(j)));
+                                            }
+
+                                        }
+                                    }                           
+                                }
+                            }
+                        
+                        }else if(x.equals("xi") && x2.equals("xi")){
+                            
+                            for(int i = 0; i< sig1.size(); i++){
+                                for(int j = 0 ; j< sig2.size() ; j++){
+                                    for(int k = 0;k<t1.size();k++){
+                                        Hoja n = t1.get(k);
+                                        if(n.getNo()== sig1.get(i)){
+                                            if(n.siguiente != null){
+                                                n.setSiguiente(n.getSiguiente()+"," + sig2.get(j));
+                                            }else{
+                                                n.setSiguiente(String.valueOf(sig2.get(j)));
+                                            }
+                                        }
+                                    }                           
+                                }
+                            }
+                        
+                        }else if(x.equals("xi") && x2.equals("xd")){
+                            for(int i = 0; i< sig1.size(); i++){
+                                for(int j = 0 ; j< p2.size() ; j++){
+                                    for(int k = 0;k<t1.size();k++){
+                                        Hoja n = t1.get(k);
+                                        if(n.getNo()== sig1.get(i)){
+                                            if(n.siguiente != null){
+                                                n.setSiguiente(n.getSiguiente()+"," + p2.get(j));
+                                            }else{
+                                                n.setSiguiente(String.valueOf(p2.get(j)));
+                                            }
+
+                                        }
+                                    }                           
+                                }
+                            }
+                        }else if(x.equals("xd") && x2.equals("xi")){
+                            
+                            for(int i = 0; i< p1.size(); i++){
+                                for(int j = 0 ; j< sig2.size() ; j++){
+                                    for(int k = 0;k<t1.size();k++){
+                                        Hoja n = t1.get(k);
+                                        if(n.getNo()== p1.get(i)){
+                                            if(n.siguiente != null){
+                                                n.setSiguiente(n.getSiguiente()+"," + sig2.get(j));
+                                            }else{
+                                                n.setSiguiente(String.valueOf(sig2.get(j)));
+                                            }
+
+                                        }
+                                    }                           
+                                }
+                            }
+                        
+                        }
+                    }else if(primero.size() > 3 && siguiente.size() <=3){
+                        x = (String) primero.get(3);
+                        switch(x){
+                            case "x":
+                                r=("xi");
+                                break;
+                            case "xi":
+                                for(int i = 0; i< sig1.size(); i++){
+                                    for(int j = 0 ; j< p2.size() ; j++){
+                                        for(int k = 0;k<t1.size();k++){
+                                            Hoja n = t1.get(k);
+                                            if(n.getNo()== sig1.get(i)){
+                                                if(n.siguiente != null){
+                                                    n.setSiguiente(n.getSiguiente()+"," + p2.get(j));
+                                                }else{
+                                                    n.setSiguiente(String.valueOf(p2.get(j)));
+                                                }                                            
+                                            }
+                                        }                           
+                                    }
+                                }
+                                r=("xi");
+                                break;
+                            case "xd":
+                                for(int i = 0; i< p1.size(); i++){
+                                    for(int j = 0 ; j< p2.size() ; j++){
+                                        for(int k = 0;k<t1.size();k++){
+                                            Hoja n = t1.get(k);
+                                           if(n.getNo()== p1.get(i)){
+                                                if(n.siguiente != null){
+                                                    n.setSiguiente(n.getSiguiente()+"," + p2.get(j));
+                                                }else{
+                                                    n.setSiguiente(String.valueOf(p2.get(j)));
+                                                }                                               
+                                            }
+                                        }                           
+                                    }
+                                }
+                                break;
+                            
+                            case "xdi":
+                                r=("xi");
+                                break;
+                            default:
+                                break;
+                        }
+                    
+                    }else if(primero.size() <= 3 && siguiente.size() >3){
+                        x = (String) siguiente.get(3);
+                        switch(x){
+                            case "x":
+                                r=("xd");
+                                break;
+                            case "xi":
+                                for(int i = 0; i< sig1.size(); i++){
+                                    for(int j = 0 ; j< sig2.size() ; j++){
+                                        for(int k = 0;k<t1.size();k++){
+                                            Hoja n = t1.get(k);
+                                            if(n.getNo()== sig1.get(i)){
+                                                if(n.siguiente != null){
+                                                    n.setSiguiente(n.getSiguiente()+"," + sig2.get(j));
+                                                }else{
+                                                    n.setSiguiente(String.valueOf(sig2.get(j)));
+                                                }
+                                            }
+                                        }                           
+                                    }
+                                }
+                                break;
+                            case "xd":
+                                r=("xd");
+                                break;
+                            case "xdi":
+                                r=("xd");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    
+                    
+                    respuesta.add(primero.get(0));
+                    respuesta.add(siguiente.get(1));
+                    respuesta.add(terminados);
+                    if(r!= ""){
+                    respuesta.add(r);}
+                    break;
+                    
+                    
+                case "|":
+                    
+                    primero = obtenerTablaDeSiguientes(expresionActual.getPrimero());                   
+                    siguiente = obtenerTablaDeSiguientes(expresionActual.getSiguiente());
+                    
+                    ArrayList<Integer> primeros = (ArrayList<Integer>)primero.get(0);
+                    primeros.addAll((ArrayList<Integer>)siguiente.get(0));
+                    
+                    ArrayList<Integer> ultimos = (ArrayList<Integer>)primero.get(1);
+                    ultimos.addAll((ArrayList<Integer>)siguiente.get(1));
+                    
+                    t1 = (ArrayList<Hoja>)primero.get(2);
+                    t2 = (ArrayList<Hoja>)siguiente.get(2);
+                    
+                    terminados.addAll(t1);
+                    terminados.addAll(t2);
+                                       
+                    respuesta.add(primeros);
+                    respuesta.add(ultimos);
+                    respuesta.add(terminados);
+                    
+                    break;
+                case "*":
+                    
+                    primero = obtenerTablaDeSiguientes(expresionActual.getPrimero());                   
+                    
+                    ArrayList<Integer> first = (ArrayList<Integer>)primero.get(1);
+                    ArrayList<Integer> second = (ArrayList<Integer>)primero.get(1);
+
+                    
+                    t1 = (ArrayList<Hoja>)primero.get(2);
+                    
+                    for(int i = 0; i< second.size(); i++){
+                        for(int j = 0; j<first.size();j++){
+                            for(int k = 0;k<t1.size();k++){
+                                Hoja n = t1.get(k);
+                                if(n.getNo()== second.get(i)){
+                                    if(n.getSiguiente() != null){
+                                        n.setSiguiente(n.getSiguiente()+"," + first.get(j));
+                                    }else{
+                                        n.setSiguiente(String.valueOf(first.get(j)));
+                                    }
+                                    
+                                }
+                            } 
+                        }                                                  
+                    }
+                    
+                    terminados.addAll(t1);
+                                       
+                    respuesta.add(primero.get(0));
+                    respuesta.add(primero.get(1));
+                    respuesta.add(terminados);
+                    respuesta.add("x");
+                    break;
+                case "+":
+                    
+                    primero = obtenerTablaDeSiguientes(expresionActual.getPrimero());                   
+                    
+                    ArrayList<Integer> first1 = (ArrayList<Integer>)primero.get(1);
+                    ArrayList<Integer> second1 = (ArrayList<Integer>)primero.get(1);
+
+                    
+                    t1 = (ArrayList<Hoja>)primero.get(2);
+                    
+                    for(int i = 0; i< second1.size(); i++){
+                        for(int j = 0; j<first1.size();j++){
+                            for(int k = 0;k<t1.size();k++){
+                                Hoja n = t1.get(k);
+                                if(n.getNo()== second1.get(i)){
+                                    if(n.getSiguiente() != null){
+                                        n.setSiguiente(n.getSiguiente()+"," + first1.get(j));
+                                    }else{
+                                        n.setSiguiente("" + first1.get(j));
+                                    }
+                                    
+                                }
+                            } 
+                        }                                                  
+                    }
+                    
+                    terminados.addAll(t1);
+                                       
+                    respuesta.add(primero.get(0));
+                    respuesta.add(primero.get(1));
+                    respuesta.add(terminados);
+                    
+                    break;
+                case "?":
+                    
+                    primero = obtenerTablaDeSiguientes(expresionActual.getPrimero());                                       
+                    
+                                       
+                    respuesta.add(primero.get(0));
+                    respuesta.add(primero.get(1));
+                    respuesta.add(primero.get(2));
+                    respuesta.add("x");
+                    break;               
+            }
+        }
+        return respuesta;
+    }
+    
+    
 }
