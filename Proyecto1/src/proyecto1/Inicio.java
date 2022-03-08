@@ -5,12 +5,14 @@
  */
 package proyecto1;
 
+import Error_.Error_;
 import ExpresionRegular.*;
 import analizadores.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -52,7 +54,6 @@ public class Inicio extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(153, 153, 153));
@@ -167,10 +168,6 @@ public class Inicio extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem3);
 
-        jMenuItem4.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        jMenuItem4.setText("Generar XML de Salida");
-        jMenu1.add(jMenuItem4);
-
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -226,7 +223,8 @@ public class Inicio extends javax.swing.JFrame {
         if(ins.errores.size() > 0){          
             for(int j = 0 ; j<ins.errores.size () ; j++){
                 jTextArea2.append(">>> "+ins.errores.get(j).getMessage() + ", linea: "+ins.errores.get(j).getFila()+", columna: "+ins.errores.get(j).getColumna()+".\n");
-            }           
+            }    
+            escribirErrores(ins.errores);
         }else{
             
             Proyecto1.graficar();            
@@ -269,6 +267,7 @@ public class Inicio extends javax.swing.JFrame {
                 jTextArea2.setText(null);
                 jTextArea2.append(">>> "+ins.errores.get(j).getMessage() + ", linea: "+ins.errores.get(j).getFila()+", columna: "+ins.errores.get(j).getColumna()+".\n");
             } 
+            escribirErrores(ins.errores);
         }else{
             Proyecto1.obtenerConjuntos();
             Proyecto1.verificarEntradas();
@@ -417,6 +416,23 @@ public class Inicio extends javax.swing.JFrame {
         
     }
     
+    public void escribirErrores(ArrayList<Error_> errores){
+        String resultado = "<!DOCTYPE>\n<html>\n    <head>\n <title style=>Errores</title>\n   "
+                + "<!-- CSS only -->\n" + 
+                "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3\" crossorigin=\"anonymous\">\n"
+                + "</head>\n   <body style=\"width:80%;margin:auto;\">";
+        
+        resultado += "\n    <br><center><h1>Lista De Errores</h1>\n <br>    <table class=\"table table-striped\">\n";
+        resultado += "<thead class=\"table-dark\"><td>#</td><td>Tipo</td><td>Descripción</td><td>Linea</td><td>Columna</td></thead>\n<tbody>";
+        for(int i = 0; i< errores.size(); i++){
+            resultado += "<tr><td>"+(i+1)+"</td><td>"+errores.get(i).getType()+"</td><td>"+errores.get(i).getMessage()+"</td><td>"+errores.get(i).getFila()+"</td><td>"+errores.get(i).getColumna()+"</td></tr>\n";           
+        }
+        
+        resultado += "</tbody></table></body></html>";
+        
+        Proyecto1.escribirDot("Errores", resultado, "html");
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -427,7 +443,6 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

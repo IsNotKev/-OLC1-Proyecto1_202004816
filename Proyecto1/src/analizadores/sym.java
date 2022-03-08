@@ -24,6 +24,7 @@ public class sym {
   public static final int SEPARADOR = 13;
   public static final int EOF = 0;
   public static final int CONJ = 4;
+  public static final int CARACTERESPECIAL = 22;
   public static final int error = 1;
   public static final int CONJUNTOMIN = 17;
   public static final int LLAVELEFT = 2;
@@ -52,7 +53,8 @@ public class sym {
   "CONJUNTODIGITO",
   "CONJUNTOSIGNO",
   "COMA",
-  "CARACTER"
+  "CARACTER",
+  "CARACTERESPECIAL"
   };
 }
 

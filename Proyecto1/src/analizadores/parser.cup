@@ -30,7 +30,7 @@ terminal String CONJ, DOSPUNTOS, FLECHA;
 terminal String PUNTO,OR,POR,MAS,INTERROGACION;
 terminal String PUNTOYCOMA, SEPARADOR;
 terminal String ID, CADENA;
-terminal String CONJUNTOMAY, CONJUNTOMIN, CONJUNTODIGITO, CONJUNTOSIGNO, COMA, CARACTER;
+terminal String CONJUNTOMAY, CONJUNTOMIN, CONJUNTODIGITO, CONJUNTOSIGNO, COMA, CARACTER, CARACTERESPECIAL;
 
 non terminal INICIO;
 non terminal ArrayList<Object> INSTRUCCIONES;
@@ -64,7 +64,7 @@ INSTRUCCIONES ::=  INSTRUCCIONES:lista INSTRUCCION:val {:
 
 INSTRUCCION ::= CONJ DOSPUNTOS ID:id FLECHA TCONJUNTO:con PUNTOYCOMA {: RESULT= new Conjunto(id,con); :}
 | ID:id FLECHA EXPRESION:exp PUNTOYCOMA{: RESULT = new ExpresionRegular(id, exp); :}
-| ID:id FLECHA EXPRESION:exp PUNTOYCOMA SEPARADOR{: RESULT = new ExpresionRegular(id, exp); :}
+| ID:id FLECHA EXPRESION:exp PUNTOYCOMA SEPARADOR SEPARADOR{: RESULT = new ExpresionRegular(id, exp); :}
 | ID:id DOSPUNTOS CADENA:cad PUNTOYCOMA {: RESULT = new LexemaEntrada(cad,id); :};
 
 TCONJUNTO ::= CONJUNTOMIN:c {: RESULT=new String(c); :}
@@ -74,7 +74,9 @@ TCONJUNTO ::= CONJUNTOMIN:c {: RESULT=new String(c); :}
 | LISTA:l {: RESULT = new String(l);:};
 
 LISTA ::= LISTA:l COMA CARACTER:c {: RESULT= (l+","+new String(c)); :}
-| CARACTER:c {: RESULT = new String(c); :};
+| LISTA:l COMA CARACTERESPECIAL:c {: RESULT= (l+","+new String(c)); :}
+| CARACTER:c {: RESULT = new String(c); :}
+| CARACTERESPECIAL:c {: RESULT = new String(c); :};
 
 EXPRESION ::= PUNTO EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion(".",exp1,exp2); :}
 | OR EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion("|",exp1,exp2); :}
@@ -82,5 +84,6 @@ EXPRESION ::= PUNTO EXPRESION:exp1 EXPRESION:exp2 {: RESULT = new Expresion(".",
 | POR EXPRESION:exp1 {: RESULT = new Expresion("*",exp1); :}
 | INTERROGACION EXPRESION:exp1 {: RESULT = new Expresion("?",exp1); :}
 | LLAVELEFT ID:id LLAVERIGHT {: RESULT = new Dato("id",new String(id)); :}
-| CADENA:c {: RESULT = new Dato("cadena",new String(c)); :};
+| CADENA:c {: RESULT = new Dato("cadena",new String(c)); :}
+| CARACTERESPECIAL:c {: RESULT = new Dato("especial",new String(c)); :};
 

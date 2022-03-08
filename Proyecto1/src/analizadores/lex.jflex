@@ -21,11 +21,12 @@ WHITE =[ \t\r\f\n]+
 COMENTARIOL =[\/\/][^\n]*[\n]
 COMENTARIOML =[<][!][^!]*[!][>]
 ID =[a-zA-z\_][a-zA-Z\d\_]*
+CARACTERESPECIAL = [\"][\\][\"\'n][\"];
 CADENA =[\"][^\"]*[\"]
-CONJUNTOSIGNO =[\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}][\~][\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}]
-CONJUNTODIGITO =[\d][\~][\d]
-CONJUNTOMIN =[a-z][\~][a-z]
-CONJUNTOMAY =[A-Z][\~][A-Z]
+CONJUNTOSIGNO =[\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}][ ]?[\~][ ]?[\!\"\#\$\%\&\'\(\)\*\+\-\/\:\;\,\<\>\=\?\@\\\[\]\^\_\`\{\|\}]
+CONJUNTODIGITO =[\d][ ]?[\~][ ]?[\d]
+CONJUNTOMIN =[a-z][ ]?[\~][ ]?[a-z]
+CONJUNTOMAY =[A-Z][ ]?[\~][ ]?[A-Z]
 FLECHA=[\-][ ]?[\>]
 CARACTER = [a-zA-z\d]
 
@@ -46,6 +47,7 @@ CARACTER = [a-zA-z\d]
 {FLECHA} {return new Symbol(sym.FLECHA,yycolumn,yyline,yytext());}
 
 {CARACTER} {return new Symbol(sym.CARACTER, yycolumn, yyline, yytext());}
+{CARACTERESPECIAL} {return new Symbol(sym.CARACTERESPECIAL, yycolumn, yyline, yytext());}
 {WHITE} {}
 {COMENTARIOL} {}
 {COMENTARIOML} {}

@@ -74,13 +74,13 @@ public class Proyecto1 {
                     //System.out.println("Entrada: " + entradas.get(i).getLexema() + " - Con Expresion: " + expresiones.get(j).getId());
                     String[] lex = entradas.get(i).getLexema().split("\"");
                     if(verificar(expresiones.get(j).getExpresion(),lex[1])){
-                        System.out.println("Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp());
+                        //System.out.println("Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp());
                         salida += ">>>  Entrada: " + lex[1] + " Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
                         salidajson += "\n   {\n     \"Valor\":"+entradas.get(i).getLexema()+",\n"
                                 + "     \"ExpresionRegular\":\""+entradas.get(i).getExp()+"\",\n"
                                 + "     \"Resultado\":\"Cadena Válida\"\n   },";
                     }else{
-                        System.out.println("Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp());
+                        //System.out.println("Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp());
                         salida += ">>>  Entrada: " + lex[1] + " NO Válida Con Expresión: " + entradas.get(i).getExp() + ".\n";
                         salidajson += "\n   {\n     \"Valor\":"+entradas.get(i).getLexema()+",\n"
                                 + "     \"ExpresionRegular\":\""+entradas.get(i).getExp()+"\",\n"
@@ -98,7 +98,7 @@ public class Proyecto1 {
     public static boolean verificar(Object exp, String lexema){ 
         String clase = exp.getClass().getName();
         //System.out.println(clase);
-        System.out.println(lexema);
+        //System.out.println(lexema);
         if(clase.equals("ExpresionRegular.Dato")){                     
             if(!lexema.equals("")){
                 char c = lexema.charAt(0);                  
@@ -245,11 +245,27 @@ public class Proyecto1 {
             resultado3 += "node [fontname=\"Arial\"];\n node_A [shape=record label=\""+f1+"|"+f2+"|"+f3+"\"];\n}";
             escribirDot(expresiones.get(i).getId()+"_TSiguiente",resultado3,"s");
             graficarImagen(expresiones.get(i).getId()+"_TSiguiente","s");
+            contador = 0;           
+            
+            //AFD
+            String resultado4 = "digraph G{\nlabel=\""+expresiones.get(i).getId()+"_AFD\";\nnode [shape=circle];\nrankdir=\"LR\";\n";
+            ArrayList<String> aux4 = graficarAFD(g);
+            
+            String[] ultimos = aux4.get(1).split("\\,");
+            String dd = "";
+            for(int l = 0; l<ultimos.length;l++){
+                dd+= ultimos[l] + "[shape=doublecircle];\n";
+            }
+            
+            escribirDot(expresiones.get(i).getId()+"_AFD",resultado4 + aux4.get(2) + dd+"}","afd");
+            graficarImagen(expresiones.get(i).getId()+"_AFD","afd");
             contador = 0;
             
             //Tabla de Transiciones
-            
-            
+            String resultado5 = obtenerTablaTransiciones(expresiones.get(i).getId(), aux4.get(4));
+            escribirDot(expresiones.get(i).getId()+"_TTransiciones", resultado5,"t");
+            graficarImagen(expresiones.get(i).getId()+"_TTransiciones","t");
+            contador = 0;
         }
         
         salida = ">>>   Grafos creados exitosamente.\n";
@@ -470,14 +486,16 @@ public class Proyecto1 {
                     ruta = System.getProperty("user.dir") + "\\AFD_202004816\\"+title+".txt";
                     break;
                 case "json":
-                    ruta = System.getProperty("user.dir")+"\\"+title+".json";
+                    ruta = System.getProperty("user.dir")+"\\SALIDAS_202004816\\"+title+".json";
+                    break;
+                case "html":
+                    ruta = System.getProperty("user.dir")+"\\ERRORES_202004816\\"+title+".html";
                     break;
                 default:
                     ruta = System.getProperty("user.dir") + "\\"+title+".txt";
                     break;
             }
-            
-            
+                      
             File file = new File(ruta);
             
             FileWriter fw = new FileWriter(file);
@@ -975,16 +993,239 @@ public class Proyecto1 {
         return respuesta;
     }
     
-    public ArrayList<Estado> obtenerTablaTransiciones(ArrayList<Hoja> hojas){       
-        ArrayList<Estado> estados = new ArrayList<Estado>();
+    public static String obtenerTablaTransiciones(String id, String siguientes){       
+        String[] ss = siguientes.split("\\,");
+        String resultado = "digraph G{\nlabel=\""+id+"_TTransiciones\";\n A[shape=record,label=\"";
+        String c1 = "{Estado", c2 ="{Transicion" , c3="{Siguiente";
         
-        ArrayList<Integer> n = new ArrayList<Integer>();
-        n.add(hojas.get(0).getNo());
-        Estado inicio = new Estado("S"+contador,n);
-        contador += 1; 
+        for(int i = 1; i<ss.length ;i++){
+            //System.out.println(ss[i]);
+            String[] sig = ss[i].split("\\-");
+            //System.out.println(sig[0]+sig[1]+sig[2]);
+            c1 += "|"+sig[0];
+            c2 += "|"+sig[1];
+            c3 += "|"+sig[2];         
+        }
+        resultado += c1 + "}|" + c2 + "}|" + c3+ "}\"]\n";
+        resultado += "}";
+        return resultado;
+    }
+    
+    public static ArrayList<String> graficarAFD(Object expresion){
+        ArrayList<String> respuesta = new ArrayList<String>();
+    
+        if(expresion.getClass().getName().equals("ExpresionRegular.Dato")){
+            Dato data = (Dato)expresion;
+            if(data.getTipo().equals("id")){
+                respuesta.add("S"+contador);
+                respuesta.add("S" + contador);
+                respuesta.add("S"+contador+"[label=\"S"+contador+"\"];\n");
+                respuesta.add(data.getLex());
+                respuesta.add("");
+                contador += 1;          
+            }else{
+                respuesta.add("S"+contador);
+                respuesta.add("S" + contador);
+                respuesta.add("S"+contador+"[label=\"S"+contador+"\"];\n");
+                respuesta.add(data.getLex().split("\"")[1]);
+                respuesta.add("");
+                contador += 1; 
+            }
+            
+        }else{
+            Expresion exp = (Expresion)expresion;
+            String conexiones = "";
+            String nodos = "";
+            String siguientes = "";
+            ArrayList<String> first;
+            ArrayList<String> next;
+            Boolean primero = false;
+            String[] p;
+            String[] s;
+             String[] t;
+            switch(exp.getOperador()){
+                case ".":
+                    
+                    if(contador == 0){
+                        nodos += "S[shape=point];";
+                        nodos += "S0;";
+                        conexiones += "S->S0[taillabel=\"INICIO\"]";
+                        contador += 1;
+                        primero = true;
+                    }
+                    
+                    first = graficarAFD(exp.getPrimero());
+                    next = graficarAFD(exp.getSiguiente());
+                                     
+                    p = first.get(1).split(",");
+                    s = next.get(0).split(",");
+                    
+                    String[] primeros=first.get(0).split(",");;
+                    if(primero == true){
+                        for(int i = 0;i<primeros.length;i++){
+                            t = first.get(3).split(",");
+                            conexiones += "S0->" + primeros[i]+"[taillabel=\""+t[i]+"\"]";
+                            siguientes += ",S0-"+t[i]+"-"+ primeros[i];
+                        }
+                    }
+                   
+                    for(int i = 0;i<p.length;i++){
+                        t = next.get(3).split(",");
+                        for(int j = 0;j<s.length;j++){
+                            conexiones += p[i] + "->" + s[j]+"[taillabel=\""+t[j]+"\"]";
+                            siguientes += ","+ p[i] +"-"+t[j]+"-"+ s[j];
+                        }
+                    }
+                    
+                    if(primero == true){
+                        respuesta.add("S0");
+                    }else{
+                        respuesta.add(first.get(0));
+                    }
+                    
+                    respuesta.add(next.get(1));
+                    respuesta.add(nodos+conexiones+first.get(2)+next.get(2));
+                    respuesta.add(first.get(3));
+                    respuesta.add(siguientes+first.get(4)+next.get(4));
+                    break;
+                case "|":
+                    if(contador == 0){
+                        nodos += "S[shape=point];";
+                        nodos += "S0;";
+                        conexiones += "S->S0[taillabel=\"INICIO\"]";
+                        contador += 1;
+                        primero = true;
+                    }
+                    
+                    first = graficarAFD(exp.getPrimero());
+                    next = graficarAFD(exp.getSiguiente());
+                    
+                    if(primero == true){
+                        p = first.get(0).split(",");
+                        s = next.get(0).split(",");
+                   
+                        for(int i = 0;i<p.length;i++){
+                            t=first.get(3).split(",");
+                            conexiones += "S0->"+p[i]+"[taillabel=\""+t[i]+"\"]";
+                            siguientes += ",S0-"+t[i]+"-"+ p[i];
+                        }
+                        for(int i = 0;i<s.length;i++){
+                            t=next.get(3).split(",");
+                            conexiones += "S0->"+s[i]+"[taillabel=\""+t[i]+"\"]";
+                            siguientes += ",S0-"+t[i]+"-"+ s[i];
+                        }
+                        
+                    }
+                    
+                                       
+                    respuesta.add(first.get(0)+","+next.get(0));
+                    respuesta.add(first.get(1)+","+next.get(1));
+                    respuesta.add(nodos+conexiones+first.get(2)+next.get(2));
+                    respuesta.add(first.get(3)+","+next.get(3));
+                    respuesta.add(siguientes+first.get(4)+next.get(4));
+                    break;
+                case "*":
+                    
+                    if(contador == 0){
+                        nodos += "S[shape=point];";
+                        nodos += "S0[shape=doublecircle];";
+                        conexiones += "S->S0[taillabel=\"INICIO\"]";
+                        contador += 1;
+                        primero = true;
+                    }
+                    
+                    first = graficarAFD(exp.getPrimero());
+                    
+                    
+                    p = first.get(0).split(",");
+                    s = first.get(1).split(",");
+                    t = first.get(3).split(",");
+                    
+                    for(int i = 0;i<p.length;i++){                          
+                        for(int j = 0; j<s.length;j++){
+                            conexiones += s[j]+"->"+p[i]+"[taillabel=\""+t[i]+"\"];";
+                            siguientes += ","+s[j]+"-"+t[i]+"-"+ p[i];
+                        }
+                    }
+                    
+                    if(primero == true){
+                        for(int i = 0;i<p.length;i++){
+                            conexiones += "S0->"+p[i]+"[taillabel=\""+t[i]+"\"];";
+                            siguientes += ",S0-"+t[i]+"-"+ p[i];
+                        }                       
+                    }
+                      
+                    
+                                      
+                    respuesta.add(first.get(0));
+                    respuesta.add(first.get(1));
+                    respuesta.add(nodos+conexiones+first.get(2));
+                    respuesta.add(first.get(3));
+                    respuesta.add(siguientes+first.get(4));
+                    break;
+                case "+":
+                    if(contador == 0){
+                        nodos += "S[shape=point];";
+                        nodos += "S0;";
+                        conexiones += "S->S0[taillabel=\"INICIO\"]";
+                        contador += 1;
+                        primero = true;
+                    }
+                    
+                    first = graficarAFD(exp.getPrimero());
+                    
+                    p = first.get(0).split(",");
+                    s = first.get(1).split(",");
+                    t = first.get(3).split(",");
+                    
+                    for(int i = 0;i<p.length;i++){                          
+                        for(int j = 0; j<s.length;j++){
+                            conexiones += s[j]+"->"+p[i]+"[taillabel=\""+t[i]+"\"];";
+                            siguientes += ","+s[j]+"-"+t[i]+"-"+ p[i];
+                        }
+                    }
+                    
+                    if(primero == true){
+                        for(int i = 0;i<p.length;i++){
+                            conexiones += "S0->"+p[i]+"[taillabel=\""+t[i]+"\"];";
+                            siguientes += ",S0-"+t[i]+"-"+ p[i];
+                        }                       
+                    }                      
+                                      
+                    respuesta.add(first.get(0));
+                    respuesta.add(first.get(1));
+                    respuesta.add(nodos+conexiones+first.get(2));
+                    respuesta.add(first.get(3));
+                    respuesta.add(siguientes+first.get(4));
+                    break;
+                case "?":
+                    /*if(contador == 0){
+                        nodos += "S[shape=point];";
+                        nodos += "S0[shape=doublecircle];";
+                        conexiones += "S->S0[taillabel=\"INICIO\"]";
+                        contador += 1;
+                        primero = true;
+                    }
+                                       
+                    if(primero == true){
+                        conexiones += "S0->S0[taillbel=\""+first.get(3)+"\"];";
+                    }
+                     */  
+                    
+                    first = graficarAFD(exp.getPrimero());
+                    respuesta.add(first.get(0));
+                    respuesta.add(first.get(1));
+                    respuesta.add(nodos+conexiones+first.get(2));
+                    respuesta.add(first.get(3));
+                    respuesta.add(first.get(4));
+                    break;
+                default:
+                    break;
+            }
+            
+        }
         
         
-        
-        return estados;
+        return respuesta;
     }
 }
